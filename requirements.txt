@@ -1,0 +1,7 @@
+tensorflow-gpu==1.6.0
+numpy==1.13.3
+opencv_python==3.2.0.7
+matplotlib==2.0.2
+easydict==1.6
+
+#pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  tensorflow-gpu==1.6.0
