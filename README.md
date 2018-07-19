@@ -121,3 +121,20 @@ with tf.Session(graph=tf.Graph()) as sess:
   builder.add_meta_graph([tag_constants.SERVING])
 ...
 builder.save()
+
+
+说明：
+CTPN基于网上的一tensorflow ctpn实现，未做改动。
+另外ctpn与crnn一起使用时，因为都是基于tensorflow，两个graph的问题没有解决，哪位朋友解决了麻烦跟我说一下(虽然实际部署都是分开部署的)
+CRNN的代码基于以下链接的chinese版本实现的
+https://github.com/MaybeShewill-CV/CRNN_Tensorflow
+主要改动有：
+1.原作者在write tfrecords时，直接将所有图片加载到内存的，因为公司机器性能差(16G内存=GTX1060 6G显卡)，所以修改这里，现在就算你10亿样本，也不怕内存不够了。
+2.原作者直接用的RGB图来训练，但实际上三通道感觉没必要，第一导致样本数据更大，第二样本数据tfrecords大了2/3，于是我全改为单通道灰度的了。个人感觉像形文字单通道就够了，不关心颜色。
+3.原作者在计算acc的时候，采用的是tf.nn.ctc_beam_search_decoder，即返回k个概率，会导致计算acc非常非常慢，可以换成ctc_greedy_decoder会快点，不过我这是直接改为2000个iteration才算一次，另外原作者打印的时候直接将iteration写为epoch,这里改了改。
+4.原作者并未完全按CRNN论文来实现七层CNN,中间有几层都不一样，会导至感受野变小？具体影响如何我也不清楚，感觉CNN的理论支撑还是太弱了，大家都是经验。。。初学者，不懂，哪位同学可以给我解释下。。。
+5.在小分类100以下汉字时，测试效果可以，但是大一点就无法收敛了，具体可能原因：样本太少，batch太小，LR要调大？
+
+因为机器实在太慢了，折腾太久，每次试验一次一个把星期就没了，对人打击太大，就放弃折腾了，强烈建议上512GSSD+双卡GTX1080 以上才去尝试。
+
+
