@@ -67,29 +67,29 @@ The model is trained on a subet of [Synth 90k](http://www.robots.ox.ac.uk/~vgg/d
 
 
 如何训练自己的中文模型
-1.通过爬虫或者其它手段,生成汉字字库  chinese_dict.txt
+###### 1.通过爬虫或者其它手段,生成汉字字库  chinese_dict.txt
     比如本项目中用到的data/char_dict/chinese_dict.txt
-2.调用tools/establish_char_dict.py 根据字库生成字库对应的映射文件
+###### 2.调用tools/establish_char_dict.py 根据字库生成字库对应的映射文件
     data/char_dict/char_dict.json
     data/char_dict/index_2_ord_map.json
     data/char_dict/ord_2_index_map.json
-3.调用TextRecognitionDataGenerator生成图片和文件标签labels.txt
+###### 3.调用TextRecognitionDataGenerator生成图片和文件标签labels.txt
     labels.txt中如下 
     data/Train/0/1000173.jpg 懦占边肩霄远已灶撑车
     data/Test/0/1000003.jpg 氟消悸稠退怖蚀刃竞镍
-4.调用tools/write_text_tfrecords.py 生成tfrecords记录
-5.根据tfrecord来训练模型    
+###### 4.调用tools/write_text_tfrecords.py 生成tfrecords记录
+###### 5.根据tfrecord来训练模型    
   第一次直接调用 
   python tools/train_shadownet.py --dataset_dir data/tfrecords --train_num 4750000
   中途断了后,后续可以继续
   python tools/train_shadownet.py --dataset_dir data/tfrecords --train_num 4750000   --weights_path model/shadownet/shadownet_2018-07-06-09-20-32.ckpt-14000
                                                          
-6.用训练出来的模型来验证数据
+###### 6.用训练出来的模型来验证数据
   验证测试数据集
   python tools/test_shadownet.py --dataset_dir data/tfrecords --weights_path model/shadownet/shadownet_2018-06-28-12-50-28.ckpt-8000
   验证单独的图片
   python tools/demo_shadownet.py  --weights_path   model/shadownet/shadownet_2018-06-28-12-50-28.ckpt-8000 --image_path data/test_images/test_01.jpg
-7.部署到tensorflow service
+###### 7.部署到tensorflow service
     使用tf.saved_model.builder.SavedModelBuilder来导出模型
     导出的时候，通过add_meta_graph_and_variables的signature_def_map参数来定义相应的输入输出参数
     下载bazel-0.11.1-dist.zip与Tensorflow1.6对应的 service,编绎即可
@@ -129,11 +129,11 @@ CTPN基于网上的一tensorflow ctpn实现，未做改动。
 CRNN的代码基于以下链接的chinese版本实现的
 https://github.com/MaybeShewill-CV/CRNN_Tensorflow
 主要改动有：
-1.原作者在write tfrecords时，直接将所有图片加载到内存的，因为公司机器性能差(16G内存=GTX1060 6G显卡)，所以修改这里，现在就算你10亿样本，也不怕内存不够了。
-2.原作者直接用的RGB图来训练，但实际上三通道感觉没必要，第一导致样本数据更大，第二样本数据tfrecords大了2/3，于是我全改为单通道灰度的了。个人感觉像形文字单通道就够了，不关心颜色。
-3.原作者在计算acc的时候，采用的是tf.nn.ctc_beam_search_decoder，即返回k个概率，会导致计算acc非常非常慢，可以换成ctc_greedy_decoder会快点，不过我这是直接改为2000个iteration才算一次，另外原作者打印的时候直接将iteration写为epoch,这里改了改。
-4.原作者并未完全按CRNN论文来实现七层CNN,中间有几层都不一样，会导至感受野变小？具体影响如何我也不清楚，感觉CNN的理论支撑还是太弱了，大家都是经验。。。初学者，不懂，哪位同学可以给我解释下。。。
-5.在小分类100以下汉字时，测试效果可以，但是大一点就无法收敛了，具体可能原因：样本太少，batch太小，LR要调大？
+####     1.原作者在write tfrecords时，直接将所有图片加载到内存的，因为公司机器性能差(16G内存=GTX1060 6G显卡)，所以修改这里，现在就算你10亿样本，也不怕内存不够了。
+####     2.原作者直接用的RGB图来训练，但实际上三通道感觉没必要，第一导致样本数据更大，第二样本数据tfrecords大了2/3，于是我全改为单通道灰度的了。个人感觉像形文字单通道就够了，不关心颜色。
+####     3.原作者在计算acc的时候，采用的是tf.nn.ctc_beam_search_decoder，即返回k个概率，会导致计算acc非常非常慢，可以换成ctc_greedy_decoder会快点，不过我这是直接改为2000个iteration才算一次，另外原作者打印的时候直接将iteration写为epoch,这里改了改。
+####     4.原作者并未完全按CRNN论文来实现七层CNN,中间有几层都不一样，会导至感受野变小？具体影响如何我也不清楚，感觉CNN的理论支撑还是太弱了，大家都是经验。。。初学者，不懂，哪位同学可以给我解释下。。。
+####     5.在小分类100以下汉字时，测试效果可以，但是大一点就无法收敛了，具体可能原因：样本太少，batch太小，LR要调大？
 
 因为机器实在太慢了，折腾太久，每次试验一次一个把星期就没了，对人打击太大，就放弃折腾了，强烈建议上512GSSD+双卡GTX1080 以上才去尝试。
 
